@@ -1,28 +1,24 @@
 package skat.datatype
 
-case class Card(kind: Card.Kind.Value, suite: Card.Suite.Value, color: Card.Color.Value)
-object Card {
-  object Color extends Enumeration {
-    type Color = Value
-    val Red, Black = Value
-  }
+case class Card(face: Card.Face, suite: Card.Suite)//, color: Card.Color)
+object Card:
 
-  object Suite extends Enumeration {
-    type Suite = Value
-    val Diamond, Heart, Spade, Club = Value
-  }
+  // enum Color:
+  //   case Yellow, Red, Green, Black
 
-  object Kind extends Enumeration {
-    import scala.language.implicitConversions
-    protected case class KindVal(value: Int) extends super.Val
-    implicit def valueToKindVal(v: Value): KindVal = v.asInstanceOf[KindVal]
-    val Seven                                      = KindVal(0)
-    val Eight                                      = KindVal(0)
-    val Nine                                       = KindVal(0)
-    val Jack                                       = KindVal(2)
-    val Queen                                      = KindVal(3)
-    val King                                       = KindVal(4)
-    val Ten                                        = KindVal(10)
-    val Ace                                        = KindVal(11)
-  }
-}
+  enum Suite(val value:Int):
+    case Diamond extends Suite(9)
+    case Heart extends Suite(10)
+    case Spade extends Suite(11)
+    case Club extends Suite(12)
+
+
+  enum Face(val value:Int):
+    case Seven extends Face(0)
+    case Eight extends Face(0)
+    case Nine  extends Face(0)
+    case Jack  extends Face(2)
+    case Queen extends Face(3)
+    case King  extends Face(4)
+    case Ten   extends Face(10)
+    case Ace   extends Face(11)
