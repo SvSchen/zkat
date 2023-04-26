@@ -60,8 +60,7 @@ object Skat:
       _           <- ZPure.update[TrumpS,PlayS](ts => PlayS(ts.sd, ts.pds, ptds))
     } yield ()
 
-  def game: ZPure[Nothing, FullDeck, PlayS, Players, PlayerError, Unit] =
-    // : ZPure[Nothing, FullDeck, PlayS, Players, Option[String] | String, (Player, BiddingValue, Trump, DeclarerPoints)] =
+  def game: ZPure[Nothing, FullDeck, PlayS, Players, PlayerError, (Player, BiddingValue, Trump, DeclarerPoints)] =
     for {
       _                       <- deal
       t                       <- bid
@@ -73,9 +72,10 @@ object Skat:
       _ = println(s.pds)
       _ = println()
       _ = println(s.ptds)
-      // points                  <- Result.calc(declarer, biddingValue, trump)
-      // } yield (declarer, biddingValue, trump, points)
-    } yield ()
+      points                  <- Result.calc(declarer, biddingValue, trump)
+      _ = println()
+      _ = println(s"points: $points")
+    } yield (declarer, biddingValue, trump, points)
 
 @main def xx =
   val d = new Player("dealer"):

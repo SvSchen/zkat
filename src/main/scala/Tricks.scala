@@ -19,6 +19,10 @@ object PlayerCardDeck:
     pcdt.sortBy[PlayerCard](_._2)(pcd).last._1
 
 case class PlayerTrickDecks(dealer: PlayerTrickDeck, listener: PlayerTrickDeck, speaker: PlayerTrickDeck)
+object PlayerTrickDecks:
+  given Tripel[PlayerTrickDecks, PlayerTrickDeck] with
+    def tripel(ptds: PlayerTrickDecks): (PlayerTrickDeck, PlayerTrickDeck, PlayerTrickDeck) = (ptds._1, ptds._2, ptds._3)
+    def apply(t:(PlayerTrickDeck,PlayerTrickDeck,PlayerTrickDeck)): PlayerTrickDecks = PlayerTrickDecks.apply.tupled(t)
 
 object Tricks:
   import PlayerCardDeck.*
