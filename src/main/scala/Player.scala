@@ -13,7 +13,6 @@ case class Player(name: String) {
   def requestTrick(pcd: PlayerCardDeck,t: Trump): ZPure[Nothing, Any, Any, Any, PlayerError, Card]                    = ???
   def set(pd: PlayerDeck): ZPure[Nothing, Any, Any, Any, PlayerError, Unit]                                      =
     ZPure.succeed(println(s"player: $name -> $pd"))
-  // def get[A:Tripel,B](a:A):ZPure[Nothing,Any,Any,Players,PlayerError,B] = Players.get(this,a)
 }
 
 final case class Players(dealer: Player, listener: Player, speaker: Player):
@@ -28,7 +27,7 @@ object Players:
     ZPure.serviceWith(ps => zip(ps,that).productIterator.toList.asInstanceOf[List[(Player,B)]])
 
   def get[A,B](p:Player,that:A)(using Tripel[A,B]):ZPure[Nothing,Any,Any,Players,PlayerError,B] =
-    getAll(that).flatMap(ts => ZPure.fromOption(ts.find(_._1 == p)).map(_._2).mapError(_ => PlayerNotFound(p)))
+    getAll(that).flatMap(ts => ZPure.fromOption(ts.find(_._1 == p)).bimap(_ => PlayerNotFound(p),_._2))
 
   def mapAll[A,B](f:((Player,B)) => B)(that:A)(using T:Tripel[A,B]):ZPure[Nothing,Nothing,Nothing,Players,PlayerError,A] =
     ZPure.serviceWith[Players](ps => zip(ps,that) |> { (a,b,c) => T.apply((f(a),f(b),f(c)))})

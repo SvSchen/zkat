@@ -7,14 +7,14 @@ import skat.datatype.*
 
 object Skat:
   enum GameState:
-    case DealS(sd: SkatDeck, pds: PlayerDecks)                         extends GameState
-    case TrumpS(sd: SkatDeck, usd: SkatDeck, pds: PlayerDecks)         extends GameState
-    case PlayS(sd: SkatDeck, pds: PlayerDecks, ptds: PlayerTrickDecks) extends GameState
+    case DealS(sd: SkatDeck, pds: PlayerDecks)
+    case TrumpS(sd: SkatDeck, usd: SkatDeck, pds: PlayerDecks)
+    case PlayS(sd: SkatDeck, pds: PlayerDecks, ptds: PlayerTrickDecks)
 
   import GameState.*
 
   def deal: ZPure[Nothing, FullDeck, DealS, Players, PlayerError, Unit] =
-    import FullDeck.syntax.*
+    import FullDeck.Syntax.*
     import PlayerDecks.Syntax.*
     for {
       ds   <- ZPure.get[DealS].contramapState[FullDeck](_.suffle(4).split |> DealS.apply)
@@ -66,15 +66,15 @@ object Skat:
       t                       <- bid
       (declarer, biddingValue) = t
       trump                   <- selectTrump(declarer)
-      s                       <- runTricks(trump).getState.map(_._1)
-      _ = println(s.sd)
-      _ = println()
-      _ = println(s.pds)
-      _ = println()
-      _ = println(s.ptds)
+      _                       <- runTricks(trump)//.getState.map(_._1)
+      // _ = println(s.sd)
+      // _ = println()
+      // _ = println(s.pds)
+      // _ = println()
+      // _ = println(s.ptds)
       points                  <- Result.calc(declarer, biddingValue, trump)
-      _ = println()
-      _ = println(s"points: $points")
+      // _ = println()
+      // _ = println(s"points: $points")
     } yield (declarer, biddingValue, trump, points)
 
 @main def xx =

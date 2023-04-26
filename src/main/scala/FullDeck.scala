@@ -6,22 +6,22 @@ import zio.prelude.*
 import zio.prelude.fx.ZPure
 import skat.Skat.GameState.*
 
+// TODO opaque or prelude Subtype
+// TODO should this type be refined? like size = 32
 opaque type FullDeck = Seq[Card]
 
 object FullDeck:
   import Card.Face
   import Card.Suite
-  // import Card.Color
 
   def apply: FullDeck =
     for {
       k <- Face.values.toSeq
       s <- Card.Suite.values.toSeq
-      // c <- Color.values.toSeq
     } yield Card(k, s)
 
   @tailrec
-  // todo remove random side effect
+  // TODO remove random side effect
   def suffle(round: Int)(fd: FullDeck): FullDeck =
     if (round <= 0) fd
     else suffle(round - 1)(fd.zip(List.fill(fd.size)(Random.nextInt(fd.size))).sortBy(_._2).map(_._1))
@@ -44,7 +44,8 @@ object FullDeck:
       case one :: skat :: two :: three :: Nil => (skat, playerDecks(one, two, three))
       case _                                  => (Seq.empty, PlayerDecks(Seq.empty, Seq.empty, Seq.empty))
 
-  object syntax:
+  // TODO companion or extension or both
+  object Syntax:
     extension (deck: FullDeck)
       def suffle(round: Int): FullDeck   = FullDeck.suffle(round)(deck)
       def split: (SkatDeck, PlayerDecks) = FullDeck.split(deck)

@@ -1,17 +1,12 @@
 package skat.datatype
 
-case class Card(face: Card.Face, suite: Card.Suite)//, color: Card.Color)
+final case class Card(face: Card.Face, suite: Card.Suite)
 object Card:
-
-  // enum Color:
-  //   case Yellow, Red, Green, Black
-
   enum Suite(val value:Int):
     case Diamond extends Suite(9)
     case Heart extends Suite(10)
     case Spade extends Suite(11)
     case Club extends Suite(12)
-
 
   enum Face(val value:Int):
     case Seven extends Face(0)

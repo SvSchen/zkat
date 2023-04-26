@@ -22,11 +22,6 @@ object PlayerDeck:
 case class PlayerDecks(dealer: PlayerDeck, listener: PlayerDeck, speaker: PlayerDeck)
 object PlayerDecks:
   import Players.Syntax.*
-  // def map[A](f:((Player,PlayerDeck))=>A)(pds: PlayerDecks): ZPure[Nothing, Nothing, Nothing, Players, Nothing, (A,A,A)] = 
-  //   ZPure.service[Nothing, Players].map(ps => (ps zip pds) |> { (a,b,c) => (f(a),f(b),f(c))})
-
-  // def updated(player:Player,update:PlayerDeck => PlayerDeck)(pds: PlayerDecks): ZPure[Nothing, Nothing, Nothing, Players, Nothing, PlayerDecks] =
-  //   map((p,pd) => if player == p then update(pd) else pd)(pds).map(PlayerDecks(_,_,_))
 
   given Tripel[PlayerDecks, PlayerDeck] with
     def tripel(pds: PlayerDecks): (PlayerDeck, PlayerDeck, PlayerDeck) = (pds._1, pds._2, pds._3)
@@ -39,4 +34,3 @@ object PlayerDecks:
 
       def updated(player: Player)(update: PlayerDeck => PlayerDeck): ZPure[Nothing, Nothing, Nothing, Players, PlayerError, PlayerDecks] =
         Players.mapAll[PlayerDecks,PlayerDeck]((p,pd) => if player == p then update(pd) else pd)(pds)
-        // PlayerDecks.updated(player,update)(pds)
