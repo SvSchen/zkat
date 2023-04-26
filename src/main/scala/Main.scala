@@ -114,7 +114,7 @@ object Skat:
       ZPure.succeed(c)
 
   val s = new Player("speaker"):
-    var pd = Seq.empty[Card]
+    private var pd = Seq.empty[Card]
     override def set(pd:PlayerDeck)= 
       this.pd = pd 
       ZPure.unit
