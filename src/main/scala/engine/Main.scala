@@ -4,6 +4,7 @@ import zio.prelude.fx.ZPure
 
 import zio.prelude.*
 import skat.datatype.*
+import zio.Cause
 
 object Skat:
   enum GameState:
@@ -13,7 +14,7 @@ object Skat:
 
   import GameState.*
 
-  def deal: ZPure[Nothing, FullDeck, DealS, Players, PlayerError, Unit] =
+  def deal: ZPure[Nothing, FullDeck, DealS, Players, Nothing, Unit] =
     import FullDeck.Syntax.*
     import PlayerDecks.Syntax.*
     for {
@@ -39,6 +40,7 @@ object Skat:
       (trump, updatedSkat) = t
       updatedPds          <- ds.pds.updated(declarer)(_.add(ds.sd).remove(updatedSkat))
       _                   <- ZPure.update[DealS, TrumpS](ds => TrumpS(ds.sd, updatedSkat, updatedPds))
+      _ <- ZPure.succeed(println(s"selected trump: $trump"))
     } yield trump
 
   def runTricks(t: Trump): ZPure[Nothing, TrumpS, PlayS, Players, PlayerError, Unit] =
@@ -67,14 +69,7 @@ object Skat:
       (declarer, biddingValue) = t
       trump                   <- selectTrump(declarer)
       _                       <- runTricks(trump)//.getState.map(_._1)
-      // _ = println(s.sd)
-      // _ = println()
-      // _ = println(s.pds)
-      // _ = println()
-      // _ = println(s.ptds)
       points                  <- Result.calc(declarer, biddingValue, trump)
-      // _ = println()
-      // _ = println(s"points: $points")
     } yield (declarer, biddingValue, trump, points)
 
 @main def xx =
@@ -85,13 +80,15 @@ object Skat:
       ZPure.unit
     override def requestBiddingValue(
       value: BiddingValue
-    ): ZPure[Nothing, Any, Any, Any, Option[PlayerError], BiddingValue] = ZPure.fail(None)
+    ): ZPure[Nothing, Any, Any, Any, Option[PlayerError], BiddingValue] = 
+      ZPure.fail(None)
     override def accept(value: BiddingValue): ZPure[Nothing, Any, Any, Any, Option[PlayerError], BiddingValue] =
       ZPure.fail(None)
     override def requestTrick(pcd: PlayerCardDeck,t:Trump): ZPure[Nothing,Any,Any, Any, PlayerError, Card] =
       val c=pd.head
       pd = pd.tail
       ZPure.succeed(c)
+    def requestTrump(skat: SkatDeck): ZPure[Nothing, Any, Nothing, Any, PlayerError, (Trump, SkatDeck)] = ???
 
   val l = new Player("listener"):
     var pd = Seq.empty[Card]
@@ -100,9 +97,14 @@ object Skat:
       ZPure.unit
     override def requestBiddingValue(
       value: BiddingValue
-    ): ZPure[Nothing, Any, Any, Any, Option[PlayerError], BiddingValue] = ZPure.succeed[Any, BiddingValue](value)
+    ): ZPure[Nothing, Any, Any, Any, Option[PlayerError], BiddingValue] =
+      ZPure.succeed[Any, BiddingValue](value)
     override def accept(value: BiddingValue): ZPure[Nothing, Any, Any, Any, Option[PlayerError], BiddingValue] =
-      ZPure.fail(None)
+      println(s"listener accept: $value")
+      value match
+        case 18 => ZPure.succeed[Any, BiddingValue](value)
+        case 20 => ZPure.succeed[Any, BiddingValue](value)
+        case _ => ZPure.fail(None)
     override def requestTrump(
       skat: SkatDeck
     ): ZPure[Nothing, Any, Nothing, Any, PlayerError, (Trump, SkatDeck)] = ZPure
@@ -120,12 +122,17 @@ object Skat:
       ZPure.unit
     override def requestBiddingValue(
       value: BiddingValue
-    ): ZPure[Nothing, Any, Any, Any, Option[PlayerError], BiddingValue] = ZPure.fail(None)
+    ): ZPure[Nothing, Any, Any, Any, Option[PlayerError], BiddingValue] = 
+      println(s"speaker request: $value")
+      value match
+        case 18 => ZPure.succeed[Any, BiddingValue](value)
+        case _ => ZPure.fail(None)
     override def accept(value: BiddingValue): ZPure[Nothing, Any, Any, Any, Option[PlayerError], BiddingValue] =
       ZPure.fail(None)
     override def requestTrick(pcd: PlayerCardDeck,t:Trump): ZPure[Nothing,Any,Any, Any, PlayerError, Card] =
       val c=pd.head
       pd = pd.tail
       ZPure.succeed(c)
+    def requestTrump(skat: SkatDeck): ZPure[Nothing, Any, Nothing, Any, PlayerError, (Trump, SkatDeck)] = ???
 
-  Skat.game.provideService(Players(d, l, s)).runAll(FullDeck.apply)
+  println(Skat.game.provideService(Players(d, l, s)).runAll(FullDeck.apply))

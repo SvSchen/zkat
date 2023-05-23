@@ -1,18 +1,19 @@
 package skat.datatype
 import zio.prelude.fx.ZPure
 import zio.prelude.*
+import zio.Cause
 
 sealed trait PlayerError
 case object NoPlayerBidding extends PlayerError
 case class PlayerNotFound(p:Player) extends PlayerError
+case class InputError(s:String) extends PlayerError
 
-trait Player(name: String):
-  def requestBiddingValue(value: BiddingValue): ZPure[Nothing, Any, Any, Any, Option[PlayerError], BiddingValue] = ???
-  def accept(value: BiddingValue): ZPure[Nothing, Any, Any, Any, Option[PlayerError], BiddingValue]              = ???
-  def requestTrump(skat: SkatDeck): ZPure[Nothing, Any, Nothing, Any, PlayerError, (Trump, SkatDeck)]            = ???
-  def requestTrick(pcd: PlayerCardDeck,t: Trump): ZPure[Nothing, Any, Any, Any, PlayerError, Card]                    = ???
-  def set(pd: PlayerDeck): ZPure[Nothing, Any, Any, Any, PlayerError, Unit]                                      =
-    ZPure.succeed(println(s"player: $name -> $pd"))
+trait Player(val name: String):
+  def requestBiddingValue(value: BiddingValue): ZPure[Nothing, Any, Any, Any, Option[PlayerError], BiddingValue]
+  def accept(value: BiddingValue): ZPure[Nothing, Any, Any, Any, Option[PlayerError], BiddingValue]
+  def requestTrump(skat: SkatDeck): ZPure[Nothing, Any, Nothing, Any, PlayerError, (Trump, SkatDeck)]
+  def requestTrick(pcd: PlayerCardDeck,t: Trump): ZPure[Nothing, Any, Any, Any, PlayerError, Card]
+  def set(pd: PlayerDeck): ZPure[Nothing, Any, Any, Any, Nothing, Unit]
 
 final case class Players(dealer: Player, listener: Player, speaker: Player):
   val size                        = this.productArity
@@ -22,7 +23,7 @@ final case class Players(dealer: Player, listener: Player, speaker: Player):
     else listener
 
 object Players:
-  def getAll[A,B](that:A)(using Tripel[A,B]):ZPure[Nothing,Any,Any,Players,PlayerError,List[(Player,B)]] =
+  def getAll[A,B](that:A)(using Tripel[A,B]):ZPure[Nothing,Any,Any,Players,Nothing,List[(Player,B)]] =
     ZPure.serviceWith(ps => zip(ps,that).productIterator.toList.asInstanceOf[List[(Player,B)]])
 
   def get[A,B](p:Player,that:A)(using Tripel[A,B]):ZPure[Nothing,Any,Any,Players,PlayerError,B] =

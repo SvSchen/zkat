@@ -29,7 +29,7 @@ object PlayerDecks:
 
   object Syntax:
     extension (pds: PlayerDecks)
-      def ppds: ZPure[Nothing, Any, Any, Players, PlayerError, List[(Player, PlayerDeck)]] =
+      def ppds: ZPure[Nothing, Any, Any, Players, Nothing, List[(Player, PlayerDeck)]] =
         Players.getAll(pds)
 
       def updated(player: Player)(update: PlayerDeck => PlayerDeck): ZPure[Nothing, Nothing, Nothing, Players, PlayerError, PlayerDecks] =
