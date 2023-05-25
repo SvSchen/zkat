@@ -20,7 +20,6 @@ class WsPlayer(name: String, in: Dequeue[String], out: Enqueue[String]) extends 
     out.offer(msg)
 
   private def answer(msg: String): ZIO[Any, Nothing, String] =
-    println(s"$name: $msg")
     print(msg) *> in.take
 
   private def error(msg: String): UIO[Boolean] =
@@ -109,5 +108,4 @@ class WsPlayer(name: String, in: Dequeue[String], out: Enqueue[String]) extends 
     ).mapError(_.failures.flatten.head)
 
   def set(pd: PlayerDeck): ZPure[Nothing, Any, Any, Any, Nothing, Unit] =
-    println(s"Your deck: ${pd.mkString(", ")}")
-    fromZIO(out.offer(s"Your deck: ${pd.mkString(", ")}").unit).mapError(_.failures.head)
+    fromZIO(print(s"Welcome! Your are $name") *> print(s"Your deck: ${pd.mkString(", ")}").unit).mapError(_.failures.head)

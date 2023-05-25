@@ -1,5 +1,6 @@
 package server
 import skat.datatype.Players
+import skat.datatype.Players.Syntax.*
 import zio.*
 import zio.http.ChannelEvent.ChannelRead
 import zio.http.ChannelEvent.ChannelRegistered
@@ -83,11 +84,6 @@ object SkatWebSocket extends ZIOAppDefault:
           os  <- observers.get
           ps  <- players.get
           psn <-
-            for {
-              qs       <- (Queue.bounded[String](2), Queue.bounded[String](2)).mapN((in, out) => (in, out))
-              (in, out) = qs
-              psm      <- players.updateAndGet(_.updated(ch.id, (ch, in, out, name => new WsPlayer(name, in, out))))
-            } yield (psm)
             ((Queue.bounded[String](2), Queue.bounded[String](2))
               .mapN((in, out) => (in, out))
               .flatMap((in, out) =>

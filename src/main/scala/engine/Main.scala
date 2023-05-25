@@ -4,7 +4,6 @@ import zio.prelude.fx.ZPure
 
 import zio.prelude.*
 import skat.datatype.*
-import zio.Cause
 
 object Skat:
   enum GameState:
