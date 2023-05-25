@@ -13,7 +13,7 @@ Skat is like FP, if you get it some time, it's just fun.
       - to model the player IO
   - [Subtype](https://zio.github.io/zio-prelude/docs/newtypes/#subtypes) to refine types
 
-- ZIO http
+- [ZIO http](https://github.com/zio/zio-http)
   - to implement the websocket communication 
 
-- ZIO as runtime
+- [ZIO](https://zio.dev) as runtime
